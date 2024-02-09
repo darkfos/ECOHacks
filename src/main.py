@@ -5,7 +5,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 # Локальные директивы
 from src import configuration
-from src.bot import commands_router
+from src.bot import commands_router, set_commands
 
 # Сторонние библиотеки
 import logging
@@ -26,9 +26,14 @@ async def start_application() -> None:
     #Подключаем логирование
     logging.basicConfig(level=logging.INFO)
 
+    #Подключение роутеров
     dp_bot.include_routers(
         commands_router
     )
+
+    #Устанавливаем список команд в меню подсказок
+    await set_commands(bot=eco_bot)
+
 
     try:
 
