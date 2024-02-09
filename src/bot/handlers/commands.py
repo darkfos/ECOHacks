@@ -1,4 +1,5 @@
 # Aiogram
+import datetime
 
 from aiogram import Router, types
 from aiogram.filters import CommandStart, Command
@@ -67,5 +68,42 @@ async def com_clear(message: types.Message, state: FSMContext) -> None:
 
     #Очистка состояния
     await state.clear()
+    logging.info(msg="Пользователь {0} очистил состояния!".format(message.from_user.full_name))
     await message.answer(text="Очистка была успешно проведена!")
 
+
+@commands_router.message(Command("reg"))
+async def com_reg(message: types.Message) -> None:
+    """
+    Асинхронный метод для обработки команды 'reg' -> производим регистрацию пользователя
+    :param message:
+    :return:
+    """
+
+    to_reg_data: tuple = message.from_user.full_name, message.from_user.id, datetime.datetime.now()
+    logging.info(msg="Пользователь {0} вызвал команду reg".format(message.from_user.full_name))
+    await message.answer(text="Вы были успешно зарегистрированы!")
+
+
+@commands_router.message(Command("profile"))
+async def com_profile(message: types.Message) -> None:
+    """
+    Асинхронный метод для доступа к личному профилю пользователя
+    :param message:
+    :return:
+    """
+
+    logging.info(msg="Пользователь {0} вызвал команду profile".format(message.from_user.full_name))
+    await message.answer(text=f"Добро пожаловать в личный профиль {message.from_user.full_name}!")
+
+
+@commands_router.message(Command("event"))
+async def com_event(message: types.Message) -> None:
+    """
+    Асинхронный метод для обработки команды 'event', получаем от User название и по возможности коннектим
+    :param message:
+    :return:
+    """
+
+    logging.info(msg="Пользователь {0} вызвал команду event".format(message.from_user.full_name))
+    await message.answer(text=f"Пожалуйста, введите название события")
