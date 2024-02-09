@@ -5,7 +5,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 # Локальные директивы
 from src import configuration
-from src.bot import commands_router, set_commands
+from src.bot import commands_router, state_router, message_router, set_commands
 
 # Сторонние библиотеки
 import logging
@@ -28,7 +28,9 @@ async def start_application() -> None:
 
     #Подключение роутеров
     dp_bot.include_routers(
-        commands_router
+        commands_router,
+        state_router,
+        message_router
     )
 
     #Устанавливаем список команд в меню подсказок
