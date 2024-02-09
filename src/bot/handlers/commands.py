@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 
 # Локальные директивы
 from src.bot import text
-from src.bot import ReportUser
+from src.bot import ReportUser,get_profile_buttons
 
 # Сторонние библиотеки
 import logging
@@ -93,8 +93,11 @@ async def com_profile(message: types.Message) -> None:
     :return:
     """
 
+    #Нужная клавиатура для профиля
+    keyboard = await get_profile_buttons()
+
     logging.info(msg="Пользователь {0} вызвал команду profile".format(message.from_user.full_name))
-    await message.answer(text=f"Добро пожаловать в личный профиль {message.from_user.full_name}!")
+    await message.answer(text=f"Добро пожаловать в личный профиль {message.from_user.full_name}!", reply_markup=keyboard.as_markup())
 
 
 @commands_router.message(Command("event"))
