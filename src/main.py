@@ -1,11 +1,14 @@
 # Aiogram
+import datetime
+
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.memory import MemoryStorage
 
 
 # Локальные директивы
-from src import configuration
+from src import configuration, UserInfo
 from src.bot import commands_router, state_router, message_router, set_commands
+from src import Database
 
 # Сторонние библиотеки
 import logging
@@ -26,6 +29,7 @@ async def start_application() -> None:
     #Подключаем логирование
     logging.basicConfig(level=logging.INFO)
 
+
     #Подключение роутеров
     dp_bot.include_routers(
         commands_router,
@@ -38,6 +42,8 @@ async def start_application() -> None:
 
 
     try:
+        # Создаём и подключаемся к БД
+        Database()
 
         await dp_bot.start_polling(eco_bot)
         logging.info(msg="Бот начал свою работу")
