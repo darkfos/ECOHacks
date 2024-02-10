@@ -17,7 +17,7 @@ async def get_all_users() -> tuple | bool:
     logging.info(msg="Осуществлён запрос на получение всех пользователей")
 
     with db.connect_to_db.cursor() as cursor:
-        cursor.execute("SELECT * FROM Users")
+        cursor.execute("SELECT * FROM users")
         all_data: tuple = cursor.fetchall()
         if all_data:
             return cursor.fetchall()

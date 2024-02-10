@@ -17,12 +17,17 @@ async def get_all_events() -> tuple | bool:
     logging.info(msg="Отправлен запрос на получение всех событий")
 
     with db.connect_to_db.cursor() as cursor:
-        all_data: tuple | str = cursor.execute("SELECT * FROM Events")
 
-        if all_data:
-            return cursor.fetchall()
-        else:
-            logging.info(msg="События не были найдено")
+        try:
+            cursor.execute("SELECT * FROM events")
+            all_data: tuple = cursor.fetchall()
+            if all_data:
+                return all_data
+            else:
+                return False
+
+        except Exception as ex:
+            logging.info(msg="События не были найдены")
             return False
 
 
@@ -34,10 +39,12 @@ async def get_event_by_id(tg_id: int) -> tuple | bool:
     logging.info(msg="Отправлен запрос на получение события по ключу")
 
     with db.connect_to_db.cursor() as cursor:
-        all_data: tuple | str = cursor.execute("SELECT * FROM Events WHERE tg_id = (%s)", (tg_id, ))
+        cursor.execute("SELECT * FROM Events WHERE tg_id = (%s)", (tg_id, ))
+
+        all_data: tuple | str = cursor.fetchall()
 
         if all_data:
-            return cursor.fetchall()
+            return all_data
         else:
             logging.info(msg="Событие не было найдено")
             return False
@@ -56,14 +63,16 @@ async def post_event(event_data: EventInfo) -> bool:
         #Получаем user id, по tg_id
 
         with db.connect_to_db.cursor() as cursor:
-            user_id: tuple = cursor.execute("SELECT user_id FROM Users WHERE tg_id = (%s)", (event_data.tg_id))
+            cursor.execute("SELECT user_id FROM Users WHERE tg_id = (%s)", (event_data.tg_id, ))
+            user_id: tuple = cursor.fetchone()
+
             if user_id:
                 user_id: int = user_id[0]
 
-                cursor.execute("INSERT INTO Events (tg_id, message_event, date_event, photo) VALUES (%s, %s, %s, %s, %s)", (*all_data, user_id, ))
+                cursor.execute("INSERT INTO Events (tg_id, message_event, date_event, photo, user_id) VALUES (%s, %s, %s, %s, %s)", (*all_data, user_id, ))
 
                 db.connect_to_db.commit()
-
+            else: raise Exception
         return True
     except Exception as ex:
         logging.exception(msg="Не удалось создать событие")
@@ -79,7 +88,7 @@ async def del_events(tg_id: int) -> bool:
 
     try:
         with db.connect_to_db.cursor() as cursor:
-            cursor.execute("DELETE FROM WHERE tg_id = (%s)", (tg_id, ))
+            cursor.execute("DELETE FROM Events WHERE tg_id = (%s)", (tg_id, ))
 
             db.connect_to_db.commit()
             return True

@@ -1,5 +1,4 @@
 # Сторонние директории
-import asyncio
 import datetime
 import unittest
 
