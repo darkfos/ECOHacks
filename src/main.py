@@ -9,7 +9,6 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from src import configuration, UserInfo
 from src.bot import commands_router, state_router, message_router, set_commands
 from src import Database
-from src.database import del_all_users
 
 # Сторонние библиотеки
 import logging
@@ -30,7 +29,6 @@ async def start_application() -> None:
     #Подключаем логирование
     logging.basicConfig(level=logging.INFO)
 
-    print(await del_all_users())
 
     #Подключение роутеров
     dp_bot.include_routers(
