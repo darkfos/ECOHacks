@@ -1,6 +1,10 @@
+# Сторонние директории
 import psycopg2
 import logging
+
+# Локальные директории
 from src import configuration
+
 class Database:
 
     def __init__(self):

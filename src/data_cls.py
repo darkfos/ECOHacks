@@ -1,6 +1,10 @@
 import datetime
 from dataclasses import dataclass
 
+"""
+    Дата классы для удобного хранения информации. А так же более удобной сортировки, обработки
+"""
+
 
 @dataclass
 class UserInfo:

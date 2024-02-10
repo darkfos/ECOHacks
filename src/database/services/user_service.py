@@ -18,7 +18,6 @@ async def get_all_users() -> tuple | bool:
 
     with db.connect_to_db.cursor() as cursor:
         all_data: tuple = cursor.execute("SELECT * FROM Users")
-
         if all_data:
             return cursor.fetchall()
         else:
@@ -39,7 +38,7 @@ async def post_user(info_user: UserInfo) -> bool | str:
             #Проверка на то, что User уже есть.
             cursor.execute("SELECT user_id FROM Users WHERE tg_id = (%s)", (tg_id, ))
 
-            if cursor:
+            if cursor.fetchone():
                 return "Вы уже зарегистрированы!"
 
             data_to_add: tuple = info_user.name_user, info_user.tg_id, info_user.date_reg
@@ -64,11 +63,17 @@ async def del_user(tg_id_user: int) -> bool:
     with db.connect_to_db.cursor() as cursor:
 
         try:
-            cursor.execute("DELETE FROM Users WHERE tg_id = (%s)", (tg_id_user,))
+            data = cursor.execute("SELECT user_id FROM Users WHERE tg_id = (%s)", (tg_id_user, ))
 
-            #Сохраняем изменения
-            db.connect_to_db.commit()
-            return True
+            if data:
+
+                cursor.execute("DELETE FROM Users WHERE tg_id = (%s)", (tg_id_user,))
+
+                #Сохраняем изменения
+                db.connect_to_db.commit()
+                return True
+
+            else: raise Exception
 
         except Exception as ex:
             logging.critical(msg="Запрос на удаление пользователя по id = {0} не удался".format(tg_id_user))
