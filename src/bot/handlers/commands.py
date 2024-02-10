@@ -8,7 +8,9 @@ from aiogram.fsm.context import FSMContext
 
 # Локальные директивы
 from src.bot import text
-from src.bot import ReportUser,get_profile_buttons
+from src.bot.keyboards import get_profile_buttons
+from src.bot.states import ReportUser
+
 
 # Сторонние библиотеки
 import logging

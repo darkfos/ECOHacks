@@ -4,7 +4,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
 #Локальные директивы
-from bot import ReportUser
+from src.bot.states import ReportUser
 
 #Сторонние директивы
 state_router: Router = Router()

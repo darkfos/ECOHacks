@@ -6,6 +6,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 # Локальные директивы
 from src import configuration
 from src.bot import commands_router, state_router, message_router, set_commands
+from src import Database
 
 # Сторонние библиотеки
 import logging
@@ -38,6 +39,8 @@ async def start_application() -> None:
 
 
     try:
+        # Создаём и подключаемся к БД
+        Database()
 
         await dp_bot.start_polling(eco_bot)
         logging.info(msg="Бот начал свою работу")
