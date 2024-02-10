@@ -32,6 +32,7 @@ class HistoryEventInfo:
 class ReportInfo:
     message_history: str
     tg_id: int
-    geo_position: str
     photo: bytes
+    geo_position: str
+    street_data: str
     date_report: datetime.datetime = datetime.datetime.now()

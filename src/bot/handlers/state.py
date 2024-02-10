@@ -8,6 +8,7 @@ from aiogram.fsm.context import FSMContext
 
 #Локальные директивы
 from src.bot.states import ReportUser
+from src.bot.keyboards import get_geo_button
 from src.data_cls import ReportInfo
 from src import post_report, del_report, configuration
 
@@ -56,14 +57,17 @@ async def photo_from_user(message: types.Message, state: FSMContext) -> None:
         itog_img = img_byte.content
 
         await state.update_data(photo_user=itog_img)
-        await message.answer(text="Отлично. Жду гео данные!")
-        await state.set_state(ReportUser.geo_position)
+
+        await message.answer(text="Отлично. Пожалуйста напишите примерный адрес\n\nЕсли вы находитесь у данного объекта" \
+                                  "пожалуйста оставьте свои гео данные \n\n(<b>Нажмите на кнопку</b>)", parse_mode="HTML", reply_markup=await get_geo_button())
+
+        await state.set_state(ReportUser.street_data)
     else:
         await message.answer(text="Вы отправили не фото.")
 
 
 
-@state_router.message(ReportUser.geo_position)
+@state_router.message(ReportUser.street_data)
 async def geo_position(message: types.Message, state: FSMContext) -> None:
     """
     Обработка состояния, гео данные от пользователя
@@ -74,20 +78,25 @@ async def geo_position(message: types.Message, state: FSMContext) -> None:
 
     await state.update_data(geo_position=message.text)
 
+    data_coroutine_dct: dict = dict(await state.get_data())
     data_coroutine = list((await state.get_data()).values())
-    data_to_add: ReportInfo = ReportInfo(message_history=data_coroutine[0], tg_id=data_coroutine[1], geo_position=data_coroutine[3], photo=data_coroutine[2], date_report=datetime.datetime.now())
+    data_to_add: ReportInfo = ReportInfo(message_history=data_coroutine[0], tg_id=data_coroutine[1], geo_position=data_coroutine_dct.get("geo_position") if data_coroutine_dct.get("geo_position") != "" else "Отсутствует", photo=data_coroutine[2], date_report=datetime.datetime.now(), street_data=data_coroutine[-1])
+
 
     #Очистка состояния
     await state.clear()
 
     try:
+        flag_geo = False
 
-        #Заносим данные в БД
-        await post_report(data_report=data_to_add)
+        if data_coroutine_dct.get("geo_position"):
+            flag_geo = True
 
+        # Заносим данные в БД
+        await post_report(data_report=data_to_add, flag=flag_geo)
 
         await message.answer(text="Отлично, ваш отчёт был сохранён! Спасибо за ваш вклад")
 
     except Exception as ex:
-        logging.exception(msg="Ошибка у пользователя {0} не смог отправить отчёт".format(message.from_user.id))
+        logging.exception(msg="Ошибка пользователь {0} не смог отправить отчёт".format(message.from_user.id))
         await message.answer(text="К сожалению ваш отчёт не был сохранён. Внутреняя ошибка")

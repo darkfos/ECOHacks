@@ -9,4 +9,6 @@ class ReportUser(StatesGroup):
     message_text: str = State()
     tg_id: int = State()
     photo_user: bytes = State()
-    geo_position: str = State()
+    street_data: str = State()
+    latitude: int = State()
+    longitude: int = State()

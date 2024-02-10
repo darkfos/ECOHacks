@@ -5,7 +5,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 # Локальные директивы
 from src import configuration
-from src.bot import commands_router, state_router, message_router, set_commands
+from src.bot import commands_router, state_router, message_router, set_commands, callback_router
 from src import Database
 
 # Сторонние библиотеки
@@ -35,6 +35,7 @@ async def start_application() -> None:
     dp_bot.include_routers(
         commands_router,
         state_router,
+        callback_router,
         message_router
     )
 

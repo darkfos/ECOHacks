@@ -9,15 +9,19 @@ import logging
 db = Database()
 
 
-async def post_report(data_report: ReportInfo) -> bool:
+async def post_report(data_report: ReportInfo, flag: False) -> bool:
     """
     Асинхронный метод на добавление отчёта
     """
 
     with db.connect_to_db.cursor() as cursor:
         try:
-            data_to_add: tuple = data_report.message_history, data_report.tg_id, data_report.geo_position, data_report.photo, data_report.date_report
-            cursor.execute("INSERT INTO reports (message_history, tg_id, geo_position, photo, date_report) VALUES (%s, %s, %s, %s, %s)", data_to_add)
+            if flag:
+                data_to_add: tuple = data_report.message_history, data_report.tg_id, data_report.street_data, data_report.geo_position, data_report.photo, data_report.date_report
+                cursor.execute("INSERT INTO reports (message_history, tg_id, street_data, geo_position, photo, date_report) VALUES (%s, %s, %s, %s, %s, %s)", data_to_add)
+            else:
+                data_to_add: tuple = data_report.message_history, data_report.tg_id, data_report.street_data, data_report.photo, data_report.date_report
+                cursor.execute("INSERT INTO reports (message_history, tg_id, geo_position, photo, date_report) VALUES (%s, %s, %s, %s, %s)", data_to_add)
             logging.info(msg="Был осуществлён запрос на добавление отчёта")
             return True
         except Exception as ex:

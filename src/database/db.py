@@ -40,6 +40,7 @@ class Database:
                                "history_id serial PRIMARY KEY,"
                                "message_history varchar,"
                                "tg_id bigint,"
+                               "street_data varchar,"
                                "geo_position varchar,"
                                "photo varchar,"
                                "date_report timestamp)")
