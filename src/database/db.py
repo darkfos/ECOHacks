@@ -38,6 +38,4 @@ class Database:
             logging.exception(msg="Не удалось подключиться к БД")
 
         finally:
-            if self.connect_to_db:
-                self.connect_to_db.close()
             logging.info(msg="Подключение к БД завершилось.")
