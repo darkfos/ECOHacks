@@ -1,12 +1,10 @@
 # Aiogram
-import datetime
-
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.storage.memory import MemoryStorage
 
 
 # Локальные директивы
-from src import configuration, UserInfo
+from src import configuration
 from src.bot import commands_router, state_router, message_router, set_commands
 from src import Database
 
