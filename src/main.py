@@ -7,11 +7,9 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from src import configuration
 from src.bot import commands_router, state_router, message_router, set_commands
 from src import Database
-from src.test import TestDataBase
 
 # Сторонние библиотеки
 import logging
-import unittest
 import asyncio
 
 
@@ -40,8 +38,6 @@ async def start_application() -> None:
     #Устанавливаем список команд в меню подсказок
     await set_commands(bot=eco_bot)
 
-    #Запуск тестов
-    unittest.main()
 
     try:
         # Создаём и подключаемся к БД

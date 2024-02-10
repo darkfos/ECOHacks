@@ -6,7 +6,7 @@ import unittest
 from src import get_all_users, del_all_users, del_user, post_user, update_user_name
 from src import UserInfo
 
-class TestDataBase(unittest.IsolatedAsyncioTestCase):
+class TestUserDataBase(unittest.IsolatedAsyncioTestCase):
     """
         Тестирование таблицы  - 'Users'
     """

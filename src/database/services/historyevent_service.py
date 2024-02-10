@@ -15,13 +15,18 @@ async def get_all_histories() -> tuple | bool:
     """
 
     logging.info(msg="Пользователь отправил запрос на получение всех историй")
-    with db.connect_to_db.cursor() as cursor:
-        all_data: tuple | str = cursor.execute("SELECT * FROM HistoryEvents")
 
-        if all_data:
-            return cursor.fetchall()
-        else:
-            logging.info(msg="Не удалось получить все запись историй")
+    with db.connect_to_db.cursor() as cursor:
+        try:
+            cursor.execute("SELECT * FROM HistoryEvents")
+            all_data: tuple = cursor.fetchall()
+            if all_data:
+                return all_data
+            else:
+                logging.info(msg="Не удалось получить все записи историй")
+                return False
+        except Exception as ex:
+            logging.error(msg=f"Ошибка при получении всех записей историй: {ex}")
             return False
 
 
@@ -53,21 +58,17 @@ async def post_history(history_data: HistoryEventInfo):
             #Делаем запрос на получение ключей
             tg_key: int = history_data.tg_id
 
-            user_id = cursor.execute("SELECT user_id FROM Users WHERE tg_id = (%s)", (tg_key, )).fetchone()
-            event_id = cursor.execute("SELECT event_id FROM Events WHERE tg_id = (%s)", (tg_key, )).fetchone()
-            print(user_id, event_id)
+            cursor.execute("SELECT user_id FROM Users WHERE tg_id = (%s)", (tg_key, ))
+            user_id: int = cursor.fetchone()[0]
+            cursor.execute("SELECT event_id FROM Events WHERE tg_id = (%s)", (tg_key, ))
+            event_id: int = cursor.fetchone()[0]
 
-            if user_id and event_id:
-                all_data_to_add: tuple = history_data.message_history, history_data.date_message, user_id[0], event_id[0]
-                cursor.execute("INSERT INFO HistoryEvent (message_history, date_message, user_id, event_id) VALUES (%s, %s, %s, %s)", all_data_to_add)
+            all_data_to_add: tuple = history_data.message_history, history_data.date_message, user_id, event_id
+            cursor.execute("INSERT INTO HistoryEvents (message_history, date_message, user_id, event_id) VALUES (%s, %s, %s, %s)", all_data_to_add)
 
-                #Сохраняем данные
-                db.connect_to_db.commit()
-                return True
-
-            else:
-                logging.info(msg="Не удалось создать историю")
-                return False
+            #Сохраняем данные
+            db.connect_to_db.commit()
+            return True
 
     except Exception as ex:
         logging.info(msg="Не удалось получить добавить запись истории")
@@ -81,15 +82,20 @@ async def del_history(tg_id: int) -> bool:
 
     logging.info(msg="Отправлен запрос на удаление истории")
 
-    try:
-        with db.connect_to_db.cursor() as cursor:
-            cursor.execute("DELETE FROM HistoryEvent WHERE tg_id = (%s)", (tg_id, ))
+    with db.connect_to_db.cursor() as cursor:
+        try:
+            cursor.execute("SELECT user_id FROM Users WHERE tg_id = (%s)", (tg_id, ))
 
-            #Сохраняем состояние таблицы
-            db.connect_to_db.commit()
+            user_id: list = cursor.fetchone()
 
-        return True
+            if user_id is not None:
+                cursor.execute("DELETE FROM HistoryEvents WHERE user_id = (%s)", (user_id[0], ))
 
-    except Exception as ex:
-        logging.exception(msg="Не удалось удалить историю по id = {}".format(tg_id))
-        return False
+                #Сохраняем состояние таблицы
+                db.connect_to_db.commit()
+
+                return True
+
+        except Exception as ex:
+            logging.exception(msg="Не удалось удалить историю по id = {}".format(tg_id))
+            return False

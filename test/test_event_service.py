@@ -6,7 +6,7 @@ import unittest
 from src import get_all_events, get_event_by_id, del_events, post_event
 from src import EventInfo
 
-class TestDataBase(unittest.IsolatedAsyncioTestCase):
+class TestEventDataBase(unittest.IsolatedAsyncioTestCase):
     """
         Тестирование таблицы  - 'Events'
     """
