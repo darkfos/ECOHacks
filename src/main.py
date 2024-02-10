@@ -5,7 +5,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 # Локальные директивы
 from src import configuration
-from src.bot import commands_router, state_router, message_router, set_commands
+from src.bot import commands_router, state_router, message_router, set_commands, callback_router
 from src import Database
 
 # Сторонние библиотеки
@@ -19,19 +19,23 @@ async def start_application() -> None:
     :return:
     """
 
+    #Подключаем логирование
+    logging.basicConfig(level=logging.INFO)
+
+
     #Параметры запуска
     eco_bot: Bot = Bot(token=configuration.API_KEY)
     storage: MemoryStorage = MemoryStorage()
     dp_bot: Dispatcher = Dispatcher(bot=eco_bot, storage=storage)
 
-    #Подключаем логирование
-    logging.basicConfig(level=logging.INFO)
-
+    #Подключаемся и создаем таблицы БД
+    Database()
 
     #Подключение роутеров
     dp_bot.include_routers(
         commands_router,
         state_router,
+        callback_router,
         message_router
     )
 
@@ -40,8 +44,6 @@ async def start_application() -> None:
 
 
     try:
-        # Создаём и подключаемся к БД
-        Database()
 
         await dp_bot.start_polling(eco_bot)
         logging.info(msg="Бот начал свою работу")
