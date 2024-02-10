@@ -26,3 +26,12 @@ class HistoryEventInfo:
     message_history: str
     date_message: datetime.datetime
     tg_id: int
+
+
+@dataclass
+class ReportInfo:
+    message_history: str
+    tg_id: int
+    geo_position: str
+    photo: bytes
+    date_report: datetime.datetime = datetime.datetime.now()
