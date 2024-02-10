@@ -26,7 +26,7 @@ class Database:
                                "tg_id bigint,"
                                "message_event varchar,"
                                "date_event timestamp,"
-                               "photo bytea,"
+                               "photo varchar,"
                                "user_id bigint REFERENCES Users (user_id));")
 
                 cursor.execute("CREATE TABLE IF NOT EXISTS HistoryEvents("
@@ -35,6 +35,14 @@ class Database:
                                "date_message timestamp,"
                                "user_id bigint REFERENCES Users (user_id),"
                                "event_id bigint REFERENCES Events (event_id));")
+
+                cursor.execute("CREATE TABLE IF NOT EXISTS Reports("
+                               "history_id serial PRIMARY KEY,"
+                               "message_history varchar,"
+                               "tg_id bigint,"
+                               "geo_position varchar,"
+                               "photo varchar,"
+                               "date_report timestamp)")
 
                 self.connect_to_db.commit()
 
