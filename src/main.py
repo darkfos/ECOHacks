@@ -35,8 +35,8 @@ async def start_application() -> None:
     dp_bot.include_routers(
         commands_router,
         state_router,
+        message_router,
         callback_router,
-        message_router
     )
 
     #Устанавливаем список команд в меню подсказок
@@ -44,7 +44,6 @@ async def start_application() -> None:
 
 
     try:
-
         await dp_bot.start_polling(eco_bot)
         logging.info(msg="Бот начал свою работу")
     except Exception as ex:
