@@ -2,7 +2,7 @@
 import datetime
 import logging
 
-from aiogram import Router, types
+from aiogram import Router, types, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
@@ -60,11 +60,25 @@ async def photo_from_user(message: types.Message, state: FSMContext) -> None:
 
         await message.answer(text="Отлично. Пожалуйста напишите примерный адрес\n\nЕсли вы находитесь у данного объекта" \
                                   "пожалуйста оставьте свои гео данные \n\n(<b>Нажмите на кнопку</b>)", parse_mode="HTML", reply_markup=await get_geo_button())
-
-        await state.set_state(ReportUser.street_data)
+        await state.set_state(ReportUser.longitude)
     else:
         await message.answer(text="Вы отправили не фото.")
 
+
+@state_router.message(ReportUser.longitude, F.content_type.in_({'location'}))
+async def get_geo_data(message: types.Message, state: FSMContext):
+    """
+    Асинхронный модуль для получения гео данных
+    """
+
+    logging.info(msg="Пользователь {0} отправил свои гео данные".format(message.from_user.id))
+    print(message.location)
+    print(message.location.latitude, message.location.longitude)
+    await state.update_data(longitude=message.location.longitude)
+    await state.update_data(latitude=message.location.latitude)
+
+    await message.answer(text="Отлично, напиши примерный адрес")
+    await state.set_state(ReportUser.street_data)
 
 
 @state_router.message(ReportUser.street_data)
@@ -80,7 +94,7 @@ async def geo_position(message: types.Message, state: FSMContext) -> None:
 
     data_coroutine_dct: dict = dict(await state.get_data())
     data_coroutine = list((await state.get_data()).values())
-    data_to_add: ReportInfo = ReportInfo(message_history=data_coroutine[0], tg_id=data_coroutine[1], geo_position=data_coroutine_dct.get("geo_position") if data_coroutine_dct.get("geo_position") != "" else "Отсутствует", photo=data_coroutine[2], date_report=datetime.datetime.now(), street_data=data_coroutine[-1])
+    data_to_add: ReportInfo = ReportInfo(message_history=data_coroutine[0], tg_id=data_coroutine[1], latitude=data_coroutine_dct.get("latitude"), longtitude=data_coroutine_dct.get("longitude"), photo=data_coroutine[2], date_report=datetime.datetime.now(), street_data=data_coroutine[-1])
 
 
     #Очистка состояния

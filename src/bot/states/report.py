@@ -10,5 +10,5 @@ class ReportUser(StatesGroup):
     tg_id: int = State()
     photo_user: bytes = State()
     street_data: str = State()
-    latitude: int = State()
-    longitude: int = State()
+    longitude: float = State()
+    latitude: float = State()
