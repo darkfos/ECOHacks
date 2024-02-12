@@ -9,7 +9,7 @@ import logging
 db = Database()
 
 
-async def get_all_users() -> tuple | bool:
+async def get_all_users() -> list | bool:
     """
     Асинхронный метод для получения всех пользователей
     """
@@ -18,11 +18,46 @@ async def get_all_users() -> tuple | bool:
 
     with db.connect_to_db.cursor() as cursor:
         cursor.execute("SELECT * FROM users")
-        all_data: tuple = cursor.fetchall()
+        all_data: list = cursor.fetchall()
         if all_data:
-            return cursor.fetchall()
-        else:
+            return all_data
+        return False
+
+
+async def get_users_by_tgid(tg_id: int) -> list | bool:
+    """
+        Асинхронный метод для получения пользователя по tg_id
+    """
+
+    logging.info(msg="Осуществлён запрос на получение пользователя по tg_id")
+    with db.connect_to_db.cursor() as cursor:
+        try:
+            cursor.execute("SELECT * FROM Users WHERE tg_id = (%s)", (tg_id, ))
+            all_data: list = cursor.fetchall()
+
+            if all_data: return all_data
+            raise Exception
+        except Exception as ex:
+            logging.critical(msg="Не была найдена запись пользователя по tg_id")
             return False
+
+
+async def get_user_by_idp(id: int) -> list | bool:
+     """
+         Асинхронный метод для получения пользователя по id
+     """
+
+     logging.info(msg="Осуществлён запрос на получение пользователя по tg_id")
+     with db.connect_to_db.cursor() as cursor:
+         try:
+             cursor.execute("SELECT * FROM Users WHERE user_id = (%s)", (id,))
+             all_data: list = cursor.fetchall()
+
+             if all_data: return all_data
+             raise Exception
+         except Exception as ex:
+             logging.critical(msg="Не была найдена запись пользователя по tg_id")
+             return False
 
 
 async def post_user(info_user: UserInfo) -> bool | str:
@@ -100,6 +135,27 @@ async def del_all_users() -> bool:
     except Exception as ex:
         logging.critical(msg="Запрос на удаление всех пользователей не удался")
 
+        return False
+
+
+async def del_user_by_idp(id: int) -> bool:
+    """
+    Асинхронная функция для удаления записси по первичному ключу из таблицы Users
+    """
+
+    logging.info(msg="Запрос на удаление пользователя по user_id")
+
+    try:
+        with db.connect_to_db.cursor() as cursor:
+            cursor.execute("DELETE FROM users WHERE user_id = %s", (id,))
+
+            #Сохраняем изменения
+            db.connect_to_db.commit()
+
+            return True
+
+    except Exception as ex:
+        logging.critical(msg="Запрос на удаление всех пользователей не удался")
         return False
 
 
