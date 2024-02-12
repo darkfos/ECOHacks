@@ -10,7 +10,7 @@ from aiogram.fsm.context import FSMContext
 from src.bot.states import ReportUser
 from src.bot.keyboards import get_geo_button
 from src.data_cls import ReportInfo
-from src import post_report, del_report, configuration
+from src import post_report, configuration
 
 #Сторонние директивы
 import requests

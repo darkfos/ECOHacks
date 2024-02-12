@@ -37,13 +37,33 @@ async def get_history_by_id(tg_id: int) -> tuple | bool:
 
     logging.info(msg="Пользователь отправил запрос на получение истории")
     with db.connect_to_db.cursor() as cursor:
-        data: tuple | str = cursor.execute("SELECT * FROM HistoryEvents WHERE tg_id = (%s)", (tg_id, ))
+        cursor.execute("SELECT user_id FROM Users WHERE tg_id = (%s)", (tg_id, ))
 
-        if data:
+        data_to_req_history: int = cursor.fetchone()[0] if cursor.fetchone() != None else False
+
+        if data_to_req_history:
+            data: tuple | str = cursor.execute("SELECT * FROM HistoryEvents WHERE history_id = (%s)", (data_to_req_history, ))
             return cursor.fetchall()
         else:
             logging.info(msg="Не удалось получить все записи историй по tg_id")
             return False
+
+
+async def get_history_by_idp(id: int) -> list | bool:
+    """
+    Асинхронный метод для получения события по первичному ключу
+    """
+
+    logging.info(msg="Пользователь отправил запрос на получение истории по первичному ключу")
+
+    with db.connect_to_db.cursor() as cursor:
+        cursor.execute("SELECT * FROM HistoryEvents WHERE history_id = (%s)", (id, ))
+
+        all_data: list = cursor.fetchall()
+
+        if all_data: return all_data
+        logging.critical(msg="Не удалось получить запись по первичному ключу")
+        return False
 
 
 async def post_history(history_data: HistoryEventInfo):
@@ -98,4 +118,18 @@ async def del_history(tg_id: int) -> bool:
 
         except Exception as ex:
             logging.exception(msg="Не удалось удалить историю по id = {}".format(tg_id))
+            return False
+
+
+async def del_history_by_idp(id: int) -> int:
+    """
+    Асинхронный метод для удаления записей в таблице HistoryEvents по первичному ключу
+    """
+
+    with db.connect_to_db.cursor() as cursor:
+        try:
+            cursor.execute("DELETE FROM HistoryEvents WHERE history_id = (%s)", (id, ))
+            return True
+        except Exception as ex:
+            logging.exception(msg="Не удалоь удалить историю по первичному ключу")
             return False
