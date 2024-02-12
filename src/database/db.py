@@ -27,14 +27,14 @@ class Database:
                                "message_event varchar,"
                                "date_event timestamp,"
                                "photo varchar,"
-                               "user_id bigint REFERENCES Users (user_id));")
+                               "user_id bigint REFERENCES Users (user_id) ON DELETE CASCADE ON UPDATE CASCADE);")
 
                 cursor.execute("CREATE TABLE IF NOT EXISTS HistoryEvents("
                                "history_id serial PRIMARY KEY,"
                                "message_history varchar,"
                                "date_message timestamp,"
-                               "user_id bigint REFERENCES Users (user_id),"
-                               "event_id bigint REFERENCES Events (event_id));")
+                               "user_id bigint REFERENCES Users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,"
+                               "event_id bigint REFERENCES Events (event_id) ON DELETE CASCADE ON UPDATE CASCADE);")
 
                 cursor.execute("CREATE TABLE IF NOT EXISTS Reports("
                                "history_id serial PRIMARY KEY,"
