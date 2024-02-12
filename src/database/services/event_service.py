@@ -9,7 +9,7 @@ import logging
 db = Database()
 
 
-async def get_all_events() -> tuple | bool:
+async def get_all_events() -> list | bool:
     """
     Асинхронный метод на получение всех событий
     """
@@ -31,7 +31,7 @@ async def get_all_events() -> tuple | bool:
             return False
 
 
-async def get_event_by_id(tg_id: int) -> tuple | bool:
+async def get_event_by_id(tg_id: int) -> list | bool:
     """
     Асинхронный метод на получение события по tg_id
     """
@@ -48,6 +48,22 @@ async def get_event_by_id(tg_id: int) -> tuple | bool:
         else:
             logging.info(msg="Событие не было найдено")
             return False
+
+
+async def get_event_by_idp(id: int) -> list | bool:
+    """
+    Асинхронный метод на получение события по id, первичному ключу
+    """
+
+    logging.info(msg="Отправлен запрос на получение обытия по первичному ключу")
+
+    with db.connect_to_db.cursor() as cursor:
+        cursor.execute("SELECT * FROM Events WHERE event_id = (%s)", (id, ))
+
+        all_data: list = cursor.fetchall()
+
+        if all_data: return all_data
+        return False
 
 
 async def post_event(event_data: EventInfo) -> bool:
@@ -96,3 +112,19 @@ async def del_events(tg_id: int) -> bool:
     except Exception as ex:
         logging.critical(msg="Не удалось удалить событие")
         return False
+
+
+async def del_events_by_idp(id: int) -> bool:
+    """
+    Асинхронный метод для удаления записей по id, Первичному ключу
+    """
+
+    logging.info(msg="Отправлен запрос на удаления события по id")
+
+    with db.connect_to_db.cursor() as cursor:
+        try:
+            cursor.execute("DELETE FROM Events WHERE event_id = (%s)", (id, ))
+            return True
+        except Exception as ex:
+            logging.critical(msg="Ну удалось удалить событие по первичному ключу")
+            return False
