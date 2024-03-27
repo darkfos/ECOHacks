@@ -75,7 +75,7 @@ async def post_user(info_user: UserInfo) -> bool | str:
             cursor.execute("SELECT user_id FROM Users WHERE tg_id = (%s)", (tg_id, ))
 
             if cursor.fetchone():
-                return "Вы уже зарегистрированы!"
+                raise ValueError("Вы уже зарегистрированы!")
 
             data_to_add: tuple = info_user.name_user, info_user.tg_id, info_user.date_reg
             cursor.execute("INSERT INTO Users (name_user, tg_id, date_reg) VALUES (%s, %s, %s)", data_to_add)

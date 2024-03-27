@@ -1,66 +1,34 @@
-from src.api import UserSchema, UserSchemaUpdate
-from src.api import UserModel
-from src import get_users_by_tgid, get_user_by_idp, del_user_by_idp, del_user, post_user, update_user_name
+from src.api.schemas.users import User, UserAdd
+from src.database.services.user_service import get_all_users, post_user
+import logging
 
-
-async def create_user(data: UserSchema) -> UserModel:
+async def service_user_add(new_user: UserAdd):
     """
-    Создаём пользователя по схеме
-    """
-    user: UserModel = UserModel(name_user=data.name_user, tg_id=data.tg_id, date_reg=data.date_reg)
-
-    #Заносим данные в таблицу Users
-    response = post_user(info_user=user)
-    return response
-
-
-async def get_user_idp(idp: int) -> UserModel:
-    """
-    Получаем пользователя по первичному ключу
+    Добавление нового пользователя
     """
 
-    response = await get_user_by_idp(idp)
-    return response
+    try:
+        await post_user(info_user=new_user)
+        return True
+    except Exception as ex:
+        return False
 
 
-async def get_user_tgid(tg_id: int) -> UserModel:
+async def service_all_users() -> list[User] | bool:
     """
-    Получаем пользователя по tg_id
-    """
-
-    response = await get_users_by_tgid(tg_id=tg_id)
-    return response
-
-
-async def del_user_tgid(tg_id: int) -> dict:
-    """
-    Удаляем пользователя по tg_id
+    Получение всех пользователей
     """
 
-    response = await del_user_tgid(tg_id=tg_id)
+    try:
+        all_user = await get_all_users()
 
-    if response: return {"response": True}
-    return {"response": False}
+        if all_user:
+            response_lst: list = [User(user_id=user[0], name_user=user[1], tg_id=user[2], date_reg=user[3])
+                                        for user in all_user]
+            return response_lst
 
+        return False
 
-async def del_user_id(id: int) -> dict:
-    """
-    Удаляем пользователя по id
-    """
-
-    response = await del_user_tgid(id=id)
-
-    if response: return {"response": True}
-    return {"response": False}
-
-
-async def update_user(data: UserSchemaUpdate) -> UserModel:
-    """
-    Обновляем информацию о user
-    """
-
-    user: UserModel = UserModel(name_user=data.name_user, tg_id=data.tg_id, date_reg=data.date_reg)
-
-    #Заносим данные в таблицу Users
-    response = post_user(info_user=user)
-    return response
+    except Exception as ex:
+        logging.info(msg="Не удалось добавить пользователя")
+        return False

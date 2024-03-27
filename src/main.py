@@ -7,6 +7,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from src import configuration
 from src.bot import commands_router, state_router, message_router, set_commands, callback_router
 from src import Database
+from src.api.main import run_fast_app
 
 # Сторонние библиотеки
 import logging
@@ -52,7 +53,8 @@ async def start_application() -> None:
 
 if __name__ == "__main__":
     try:
-        asyncio.run(start_application())
+        run_fast_app()
+        #asyncio.run(start_application())
     except KeyboardInterrupt as ki:
         logging.critical(msg="Бот остановил свою работу")
     except KeyError as ke:

@@ -1,14 +1,15 @@
-import datetime
+from pydantic import BaseModel, Field, field_validator
+from datetime import datetime
 
-from pydantic import BaseModel
 
-
-class UserSchema(BaseModel):
-    name_user: str
+class User(BaseModel):
+    user_id: int
+    name_user: str = Field(max_length=350)
     tg_id: int
-    date_reg: datetime.datetime
+    date_reg: datetime = Field(default_factory=datetime.now)
 
 
-class UserSchemaUpdate(BaseModel):
-    id_user: int
-    name_user: str
+class UserAdd(BaseModel):
+    name_user: str = Field(max_length=350)
+    tg_id: int
+    date_reg: datetime = Field(default_factory=datetime.now)
