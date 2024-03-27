@@ -33,7 +33,7 @@ async def get_users_by_tgid(tg_id: int) -> list | bool:
     with db.connect_to_db.cursor() as cursor:
         try:
             cursor.execute("SELECT * FROM Users WHERE tg_id = (%s)", (tg_id, ))
-            all_data: list = cursor.fetchall()
+            all_data: list = cursor.fetchone()
 
             if all_data: return all_data
             raise Exception
@@ -51,7 +51,7 @@ async def get_user_by_idp(id: int) -> list | bool:
      with db.connect_to_db.cursor() as cursor:
          try:
              cursor.execute("SELECT * FROM Users WHERE user_id = (%s)", (id,))
-             all_data: list = cursor.fetchall()
+             all_data: list = cursor.fetchone()
 
              if all_data: return all_data
              raise Exception
@@ -94,14 +94,14 @@ async def del_user(tg_id_user: int) -> bool:
     Асинхронный метод для удаления пользователя по id
     """
 
-    logging.info(msg="Осуществлён хапрос на удаления пользователя по id = {0}".format(tg_id_user))
+    logging.info(msg="Осуществлён запрос на удаления пользователя по id = {0}".format(tg_id_user))
 
     with db.connect_to_db.cursor() as cursor:
 
         try:
-            data = cursor.execute("SELECT user_id FROM Users WHERE tg_id = (%s)", (tg_id_user, ))
+            cursor.execute("SELECT user_id FROM Users WHERE tg_id = (%s)", (tg_id_user, ))
 
-            if data:
+            if cursor.fetchone():
 
                 cursor.execute("DELETE FROM Users WHERE tg_id = (%s)", (tg_id_user,))
 
@@ -159,7 +159,7 @@ async def del_user_by_idp(id: int) -> bool:
         return False
 
 
-async def update_user_name(user_name: str, tg_id: int) -> bool:
+async def update_user_name(user_name: str, tg_id: int) -> tuple | bool:
     """
     Асинхронный метод для изменения имени пользователя по tg ключу
     """
@@ -173,7 +173,8 @@ async def update_user_name(user_name: str, tg_id: int) -> bool:
             #Сохраняем изменения
             db.connect_to_db.commit()
 
-            return True
+            cursor.execute("SELECT * FROM Users WHERE tg_id = (%s)", (tg_id, ))
+            return cursor.fetchone()
 
     except Exception as ex:
         logging.critical(msg="Запрос на изменение имени пользователя не удался")
