@@ -123,7 +123,7 @@ class HistoryEventServiceDB:
                 return False
 
     @staticmethod
-    async def del_history_by_idp(id: int) -> int:
+    async def del_history_by_idp(id: int) -> bool:
         """
         Асинхронный метод для удаления записей в таблице HistoryEvents по первичному ключу
         """
