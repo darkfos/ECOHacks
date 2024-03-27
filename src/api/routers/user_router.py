@@ -2,8 +2,7 @@ import logging
 
 from fastapi import APIRouter
 from src.api.schemas.users import User, UserAdd
-from src.api.services.user import service_user_add, service_all_users, service_get_user_by_tgid, service_get_user_by_id, \
-    service_del_user_by_tg_id, service_del_user_by_id, service_upd_user_name
+from src.api.services.user import UserServiceAPI
 
 user_router: APIRouter = APIRouter(prefix="/users", tags=["User"])
 
@@ -14,7 +13,7 @@ async def get_all_users() -> list[User] | dict:
         API request для получения всех пользователей
     """
     try:
-        req = await service_all_users()
+        req = await UserServiceAPI.service_all_users()
 
         if req:
             return req
@@ -34,7 +33,7 @@ async def get_user_by_tg_id(tg_id: int) -> User | dict:
     """
 
     try:
-        user: User = await service_get_user_by_tgid(tg_id=tg_id)
+        user: User = await UserServiceAPI.service_get_user_by_tgid(tg_id=tg_id)
         if user:
             return user
     except Exception as ex:
@@ -50,7 +49,7 @@ async def get_user_by_tg_id(id: int) -> User | dict:
     """
 
     try:
-        user: User = await service_get_user_by_id(id=id)
+        user: User = await UserServiceAPI.service_get_user_by_id(id=id)
         if user:
             return user
     except Exception as ex:
@@ -60,13 +59,13 @@ async def get_user_by_tg_id(id: int) -> User | dict:
 
 
 @user_router.post("/add")
-async def get_new_user(new_user: UserAdd) -> dict:
+async def add_new_user(new_user: UserAdd) -> dict:
     """
         API request для добавления пользователя
     """
 
     try:
-        req = await service_user_add(new_user=new_user)
+        req = await UserServiceAPI.service_user_add(new_user=new_user)
         return {
             "message": "success"
         }
@@ -83,7 +82,7 @@ async def del_user(tg_id: int) -> dict:
     """
 
     try:
-        req = await service_del_user_by_tg_id(tg_id=tg_id)
+        req = await UserServiceAPI.service_del_user_by_tg_id(tg_id=tg_id)
         if req:
             return {
                 "message": "Success"
@@ -103,7 +102,7 @@ async def del_user_by_id(id: int) -> dict:
     """
 
     try:
-        req = await service_del_user_by_id(id=id)
+        req = await UserServiceAPI.service_del_user_by_id(id=id)
         if req:
             return {
                 "message": "Success"
@@ -123,7 +122,7 @@ async def update_user_name(tg_id: int, new_name_user: str) -> User | dict:
     """
 
     try:
-        req = await service_upd_user_name(tg_id=tg_id, user_name=new_name_user)
+        req = await UserServiceAPI.service_upd_user_name(tg_id=tg_id, user_name=new_name_user)
 
         if req:
             return req
