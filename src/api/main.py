@@ -15,4 +15,4 @@ def run_fast_app() -> None:
     Run application
     """
 
-    uvicorn.run(app=app)
+    uvicorn.run(app=app, port=8000)

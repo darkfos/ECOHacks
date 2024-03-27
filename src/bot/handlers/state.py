@@ -10,7 +10,8 @@ from aiogram.fsm.context import FSMContext
 from src.bot.states import ReportUser
 from src.bot.keyboards import get_geo_button
 from src.data_cls import ReportInfo
-from src import post_report, configuration
+from src import configuration
+from src.database.services.report_service import ReportServiceDB
 
 #Сторонние директивы
 import requests
@@ -107,7 +108,7 @@ async def geo_position(message: types.Message, state: FSMContext) -> None:
             flag_geo = True
 
         # Заносим данные в БД
-        await post_report(data_report=data_to_add, flag=flag_geo)
+        await ReportServiceDB.post_report(data_report=data_to_add, flag=flag_geo)
 
         await message.answer(text="Отлично, ваш отчёт был сохранён! Спасибо за ваш вклад")
 
